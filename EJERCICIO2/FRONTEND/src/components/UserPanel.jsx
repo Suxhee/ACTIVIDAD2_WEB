@@ -1,25 +1,22 @@
 import { Alert, Badge } from "reactstrap";
 
-function UserPanel() {
+function UserPanel({ saldo, total }) {
   return (
-    <Alert
-      color="info"
-      className="d-flex flex-wrap justify-content-between align-items-center shadow-sm mb-4"
-    >
+    <Alert color="info">
 
       {/* Saldo del usuario */}
-      <h5 className="mb-0">
+      <h5>
         Tu saldo actual:
         <Badge color="success" className="ms-2">
-          $25.00
+          ${saldo.toFixed(2)}
         </Badge>
       </h5>
 
       {/* Total de la reserva */}
-      <h5 className="mb-0">
+      <h5 className="mt-2">
         Total de tu Reserva:
         <Badge color="dark" pill className="ms-2">
-          $11.00
+          ${total.toFixed(2)}
         </Badge>
       </h5>
 

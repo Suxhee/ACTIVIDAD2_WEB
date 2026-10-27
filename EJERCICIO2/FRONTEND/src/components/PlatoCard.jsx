@@ -7,43 +7,41 @@ import {
   Button,
 } from "reactstrap";
 
-function PlatoCard({ plato }) {
-  const agotado = plato.stock === 0;
-
+function PlatoCard({ plato, agregarReserva }) {
   return (
-    <Card className="mb-3 h-100 shadow-sm">
+    <Card className="mb-3">
 
-      <CardBody className="d-flex flex-column">
+      <CardBody>
 
         {/* Nombre del plato */}
-        <CardTitle tag="h5" className="mb-1">
+        <CardTitle tag="h5">
           {plato.nombre}
         </CardTitle>
 
         {/* Categoría */}
-        <CardText className="text-muted small mb-2">
-          {plato.categoria}
+        <CardText>
+          Categoría: {plato.categoria}
         </CardText>
 
         {/* Precio */}
-        <div className="mb-2">
-          <Badge color="success" className="fs-5">
-            ${plato.precio.toFixed(2)}
-          </Badge>
-        </div>
+        <Badge color="success">
+          ${plato.precio.toFixed(2)}
+        </Badge>
 
         {/* Stock */}
-        <p className={`mb-3 ${agotado ? "text-danger" : "text-muted"}`}>
-          Stock disponible: <strong>{plato.stock}</strong>
+        <p className="mt-2">
+          Stock disponible: {plato.stock}
         </p>
 
-        {/* Botón según stock (siempre pegado abajo) */}
-        {agotado ? (
-          <Button color="secondary" disabled className="mt-auto w-100">
+        {/* Botón según stock */}
+        {plato.stock === 0 ? (
+          <Button color="secondary" disabled>
             Agotado
           </Button>
         ) : (
-          <Button color="primary" className="mt-auto w-100">
+          <Button color="primary"
+                  onClick={() => agregarReserva(plato.id)} //al hacer click agrega la reserva
+          >
             Añadir a la Reserva
           </Button>
         )}

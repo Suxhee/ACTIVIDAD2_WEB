@@ -7,50 +7,62 @@ import {
   ButtonGroup,
 } from "reactstrap";
 
-function ReservaSidebar({ reserva }) {
+function ReservaSidebar({ 
+  reserva,
+  aumentarCantidad,
+  disminuirCantidad,
+  eliminarItem, 
+}) {
   return (
-    <Card className="shadow-sm">
+    <Card>
 
       <CardBody>
 
-        <h4 className="mb-3">Tu Reserva</h4>
+        <h4>Tu Reserva</h4>
 
-        {reserva.length === 0 && (
-          <p className="text-muted mb-0">Aún no has agregado platos.</p>
-        )}
-
-        <ListGroup flush>
+        <ListGroup>
 
           {reserva.map((item) => (
 
-            <ListGroupItem key={item.id} className="px-0">
+            <ListGroupItem key={item.id}>
 
-              <strong className="d-block mb-2">{item.nombre}</strong>
+              <strong>{item.nombre}</strong>
 
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="mt-2">
 
                 {/* Control visual */}
                 <ButtonGroup size="sm">
 
-                  <Button color="secondary">
+                  <Button 
+                  color="secondary"
+                  onClick={() => disminuirCantidad(item.id)}>
                     -
                   </Button>
 
-                  <Button color="light" disabled className="px-3">
+                  <Button color="light">
                     {item.cantidad}
                   </Button>
 
-                  <Button color="secondary">
+                  <Button 
+                  color="secondary"
+                  onClick={() => aumentarCantidad(item.id)}>
                     +
                   </Button>
 
                 </ButtonGroup>
 
-                <Button color="danger" outline size="sm">
-                  Quitar
-                </Button>
-
               </div>
+
+              <Button
+                color="danger"
+                outline
+                size="sm"
+                className="mt-2"
+                onClick={() => eliminarItem(item.id)}
+                
+              >
+                Quitar
+              </Button>
 
             </ListGroupItem>
 

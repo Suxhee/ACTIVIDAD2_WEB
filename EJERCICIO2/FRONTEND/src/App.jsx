@@ -1,152 +1,51 @@
-import { Container, Row, Col, UncontrolledAlert } from "reactstrap";
-import { useState } from "react";
+import { Container,
+         Row, 
+         Col, 
+         Alert,
+         UncontrolledAlert,
+} from "reactstrap";
 
 import UserPanel from "./components/UserPanel";
-import PlatoCard from "./components/PlatoCard";
+import MenuDia from "./components/MenuDia";
 import ReservaSidebar from "./components/ReservaSidebar";
 
-import { menu, reservaDemo } from "./data";
+import { useReserva } from "./hooks/useReserva";
 
 function App() {
-  const [saldo, setSaldo] = useState(25); //valor inicial --> $25
-  const [menuActual, setMenuActual] = useState(menu); //valor inicial -> arreglo menu
-  const [reserva, setReserva] = useState(reservaDemo); //valor inicial -> arreglo reservaDemo
-  const [mensajeError, setMensajeError] = useState("");
-  const [cargando, setCargando] = useState(false);
-  //Para calcular el precio total
-  const total = reserva.reduce(
-    (suma, item) => suma + item.precio * item.cantidad,
-    0
-  );
-  //Saldo restante
-  const saldoRestante = saldo - total;
+  //Obtener dtos y funciones de hooks
+  const {
+    menuActual,
+    reserva,
+    saldo,
+    total,
+    segundosRestantes,
 
-  /* para el Boton agregarReserva */
-  function agregarReserva(idPlato){
-    //Para buscar el plato
-    const platoSeleccionado = menuActual.find(
-      (plato) => plato.id === idPlato
-    );
+    mensajeError,
+    mensajeExito,
+    cargando,
 
-    //Coprobar existencia o que tenga stock
-    if (!platoSeleccionado){
-      return;
-    }
+    agregarReserva,
+    aumentarCantidad,
+    disminuirCantidad,
+    eliminarItem,
+    confirmarReserva,
 
-    if (platoSeleccionado.stock <= 0) {
-      return;
-    }
-
-    //Comprobar saldo disponible
-    if(total + platoSeleccionado.precio > saldo){
-      setMensajeError("Saldo insuficiente para esta cantidad");
-      return;
-    }
-
-    setMensajeError("");
-
-    //Descontar en el stock
-    setMenuActual((menuAnterior) => 
-      menuAnterior.map((plato) =>
-      plato.id === idPlato ? {...plato, stock: plato.stock - 1}
-    : plato
-  ));
-
-    //Para actualizar la reserva
-    setReserva((reservaAnterior) => {
-      const existe = reservaAnterior.find(
-        (item) => item.id === idPlato
-      );
-
-      //Aumenta su cantidad en uno si ya hay existencias
-      if (existe){
-        return reservaAnterior.map((item) => 
-        item.id === idPlato ? {...item, cantidad: item.cantidad + 1} : item
-      );
-      }
-
-      //Añadimos el nuevo objeto
-      return [
-        ...reservaAnterior,
-        {
-          id: platoSeleccionado.id,
-          nombre: platoSeleccionado.nombre,
-          precio: platoSeleccionado.precio,
-          cantidad: 1,
-        },
-      ];
-    });
-  }
-
-  /* Funcionamiento de botones de ReservaSidebar */
-  function aumentarCantidad(idPlato){
-    agregarReserva(idPlato);
-  }
-
-  function disminuirCantidad(idPlato){
-    const item = reserva.find((item) => item.id === idPlato);
-
-    if(!item){
-      return;
-    }
-
-    //Quitar el plato si solo queda una unidad
-    if(item.cantidad === 1){
-      setReserva((reservaAnterior) => 
-        reservaAnterior.filter((item) => item.id !== idPlato)
-    );
-    } else {
-      //si hay varias unidades, restamos una
-      setReserva((reservaAnterior) =>
-        reservaAnterior.map((item) =>
-          item.id === idPlato ? {...item, cantidad: item.cantidad -1}
-          : item
-        )
-      );
-    }
-
-    //Devolver lo eliminado
-    setMenuActual((menuAnterior) =>
-     menuAnterior.map((plato)  => 
-      plato.id === idPlato ? {...plato, stock: plato.stock + 1}
-      : plato
-    )
-  );
-}
-
-
-  function eliminarItem(idPlato) {
-    const item = reserva.find((item) => item.id === idPlato);
-
-
-    if(!item) {
-      return;
-    }
-
-    console.log("Plato eliminado: ", item.nombre);
-    console.log("Cantidad reservada: ", item.cantidad);
-
-    //Eliminar plato de la reserva
-    setReserva((reservaAnterior) =>
-      reservaAnterior.filter((item) => item.id !== idPlato)
-    );
-
-  //Devolver unidades a stock
-  setMenuActual((menuAnterior) =>
-    menuAnterior.map((plato) => 
-     plato.id === idPlato ? {...plato, stock: plato.stock + item.cantidad}
-     : plato
-    )
-  );
-
-  }
-
+  } = useReserva();
+  
 
   return (
-    <Container className="mt-4">
+    <Container className="mt-4 mb-5">
+
+      {/* Titulo */}
+      <h1 className="mb-4">
+        Food DEI
+      </h1>
 
       {/* Panel superior */}
-      <UserPanel saldo={saldoRestante} total={total} />
+      <UserPanel 
+        saldo={saldo} 
+        total={total} 
+        segundosRestantes={segundosRestantes}/>
 
       {mensajeError && (
         <UncontrolledAlert color="warning">
@@ -154,38 +53,28 @@ function App() {
         </UncontrolledAlert>
       )}
 
-      {cargando && (
-        <UncontrolledAlert color="info">
-          Cargando...
-        </UncontrolledAlert>
+      {mensajeExito && (
+        <Alert color="success">
+          {mensajeExito}
+        </Alert>
       )}
 
-      <Row>
+      {cargando && (
+        <Alert color="info">
+          Cargando...
+        </Alert>
+      )}
+
+      <Row className="mt-4">
 
         {/* Menú del día */}
         <Col xs="12" md="8">
-
-          <h2 className="mb-3">
-            Menú del Día
-          </h2>
-
-          <Row>
-
-            {menuActual.map((plato) => ( //menuActual -> conectar estado con interfaz
-
-              <Col
-                xs="12"
-                md="6"
-                lg="4"
-                key={plato.id}
-              >
-                <PlatoCard plato={plato}
-                           agregarReserva={agregarReserva} /> 
-              </Col>
-
-            ))}
-
-          </Row>
+         
+         <MenuDia 
+           menu={menuActual}
+           agregarReserva={agregarReserva}
+           cargando={cargando}>
+           </MenuDia>
 
         </Col>
 
@@ -197,6 +86,8 @@ function App() {
             aumentarCantidad={aumentarCantidad}
             disminuirCantidad={disminuirCantidad}
             eliminarItem={eliminarItem} //reserva -> conectar estado con interfaz
+            confirmarReserva={confirmarReserva}
+            cargando={cargando}
           />
 
         </Col>

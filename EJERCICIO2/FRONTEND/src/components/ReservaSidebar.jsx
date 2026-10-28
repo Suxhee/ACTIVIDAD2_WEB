@@ -12,6 +12,8 @@ function ReservaSidebar({
   aumentarCantidad,
   disminuirCantidad,
   eliminarItem, 
+  confirmarReserva,
+  cargando,
 }) {
   return (
     <Card>
@@ -20,6 +22,13 @@ function ReservaSidebar({
 
         <h4>Tu Reserva</h4>
 
+        {/* Mensaje si no hay platos */}
+        {reserva.length === 0 && (
+          <p className="text-muted">
+            Todavia no tienes platos reservados.
+          </p>
+        )}
+        
         <ListGroup>
 
           {reserva.map((item) => (
@@ -28,30 +37,35 @@ function ReservaSidebar({
 
               <strong>{item.nombre}</strong>
 
-              <div className="mt-2">
+              <p className="mb-2">
+                ${item.precio.toFixed(2)} c/u
+              </p>
 
-                {/* Control visual */}
-                <ButtonGroup size="sm">
-
-                  <Button 
-                  color="secondary"
-                  onClick={() => disminuirCantidad(item.id)}>
+              <ButtonGroup size="sm">
+                 <Button
+                   color="secondary"
+                   disabled={cargando}
+                   onClick={() => disminuirCantidad(item)}>
                     -
-                  </Button>
+                   </Button>
 
-                  <Button color="light">
+                   <Button color="light" disabled>
                     {item.cantidad}
-                  </Button>
+                   </Button>
 
-                  <Button 
-                  color="secondary"
-                  onClick={() => aumentarCantidad(item.id)}>
+                   <Button
+                   color="secondary"
+                   disabled={cargando}
+                   onClick={() => aumentarCantidadrCantidad(item)}>
                     +
-                  </Button>
+                   </Button>
 
-                </ButtonGroup>
+              </ButtonGroup>
 
-              </div>
+              <p className="mt-2 mb-1">
+                subtotal: $
+                {(item.precio * item.cantidad).toFixed(2)}
+              </p>
 
               <Button
                 color="danger"
@@ -69,6 +83,15 @@ function ReservaSidebar({
           ))}
 
         </ListGroup>
+
+        <Button
+          color="success"
+          className="mt-3 w-100"
+          disabled={cargando || reserva.length === 0}
+          onClick={confirmarReserva}
+        >
+          Confirmar reserva
+        </Button>
 
       </CardBody>
 

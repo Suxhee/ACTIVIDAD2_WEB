@@ -7,9 +7,12 @@ import {
   Button,
 } from "reactstrap";
 
-function PlatoCard({ plato, agregarReserva }) {
+function PlatoCard({ plato, agregarReserva, cargando }) {
+
+  const agotado = plato.stock === 0;
+
   return (
-    <Card className="mb-3">
+    <Card className="mb-3 h-100">
 
       <CardBody>
 
@@ -29,7 +32,7 @@ function PlatoCard({ plato, agregarReserva }) {
         </Badge>
 
         {/* Stock */}
-        <p className="mt-2">
+        <p className="mt-3">
           Stock disponible: {plato.stock}
         </p>
 
@@ -40,6 +43,7 @@ function PlatoCard({ plato, agregarReserva }) {
           </Button>
         ) : (
           <Button color="primary"
+                  disabled={cargando}
                   onClick={() => agregarReserva(plato.id)} //al hacer click agrega la reserva
           >
             Añadir a la Reserva

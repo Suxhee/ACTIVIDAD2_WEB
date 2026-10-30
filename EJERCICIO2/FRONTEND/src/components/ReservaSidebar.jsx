@@ -56,7 +56,7 @@ function ReservaSidebar({
                    <Button
                    color="secondary"
                    disabled={cargando}
-                   onClick={() => aumentarCantidadCantidad(item)}>
+                   onClick={() => aumentarCantidad(item)}>
                     +
                    </Button>
 
@@ -72,6 +72,7 @@ function ReservaSidebar({
                 outline
                 size="sm"
                 className="mt-2"
+                disabled={cargando}
                 onClick={() => eliminarItem(item.id)}
                 
               >

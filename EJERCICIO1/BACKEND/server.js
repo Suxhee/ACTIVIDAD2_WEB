@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
-const port = 3001;
+const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -24,11 +24,12 @@ console.log(`Numero secreto inicial: ${numeroSecreto}`);
 
 // POST/guess
 app.post("/guess", (req, res)=> {
+    const numero = req.body?.number;
 
     if(!Number.isInteger(numero) || numero < MIN || numero > MAX){
     return res
     .status(400)
-    .json ({ mensaje: `ERROR: debes escribir un numero entero entre ${MIN}y ${MAX}` });
+    .json ({ mensaje: `ERROR: debes escribir un numero entero entre ${MIN} y ${MAX}` });
     }
 
     if (numero === numeroSecreto){

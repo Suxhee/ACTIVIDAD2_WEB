@@ -37,7 +37,7 @@ function PlatoCard({ plato, agregarReserva, cargando }) {
         </p>
 
         {/* Botón según stock */}
-        {plato.stock === 0 ? (
+        {agotado ? (
           <Button color="secondary" disabled>
             Agotado
           </Button>

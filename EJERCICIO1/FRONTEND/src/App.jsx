@@ -45,7 +45,7 @@ function App() {
     if (datos.resultado === "correcto") {
       setGameStatus(true);
     }
-  } catch (error) {
+  } catch {
     setHint("No se pudo conectar con el servidor");
   }
 };
@@ -61,7 +61,7 @@ const reiniciar = async () => {
     setGameStatus(false);
     setHint("");
     setUserGuess("");
-  } catch (error) {
+  } catch {
     setHint("No se pudo reiniciar el juego");
   }
 };

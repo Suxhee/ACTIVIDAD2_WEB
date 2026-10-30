@@ -1,0 +1,25 @@
+{
+  "name": "server.js",
+  "version": "1.0.0",
+  "description": "Backend del ejercicio 1: Adivina el Numero",
+  "homepage": "https://github.com/Suxhee/ACTIVIDAD2_WEB#readme",
+  "bugs": {
+    "url": "https://github.com/Suxhee/ACTIVIDAD2_WEB/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Suxhee/ACTIVIDAD2_WEB.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start":"node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}

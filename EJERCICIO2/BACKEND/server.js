@@ -82,6 +82,7 @@ const iniciarTemporizador = () => {
     temporizador = setTimeout(() => {
         liberarReserva();
         reservaExpirada = true;
-        console.log("[INFO] La reserva expiró y se liberó el stock");
+        console.log("La reserva expiró y se liberó el stock");
     }, DURACION_RESERVA_MS);
 };
+

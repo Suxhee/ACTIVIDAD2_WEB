@@ -56,7 +56,7 @@ function ReservaSidebar({
                    <Button
                    color="secondary"
                    disabled={cargando}
-                   onClick={() => aumentarCantidadrCantidad(item)}>
+                   onClick={() => aumentarCantidadCantidad(item)}>
                     +
                    </Button>
 

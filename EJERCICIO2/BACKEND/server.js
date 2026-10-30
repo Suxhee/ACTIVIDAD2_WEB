@@ -230,3 +230,7 @@ app.post("/api/reserva/confirmar", (req, res) => {
 
   res.json({ mensaje: `Reserva confirmada! por $${total.toFixed(2)}`, ...construirReserva() });
 });
+
+app.listen(PORT, () => {
+    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+});

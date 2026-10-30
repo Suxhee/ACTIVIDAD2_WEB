@@ -7,7 +7,9 @@ const PORT = 3002;
 const SALDO_MENSUAL_INICIAL = 36.0; //Saldo de almuerzo del usuario
 const DURACION_RESERVA_MS = 5 * 60 * 1000; //Limite de tiempo (5 minutos)
 
-//    DATOS EN MEMORIA
+/*=============================================================
+                       DATOS EN MEMORIA
+===============================================================*/   
 
 // Inventario de platillos 
 const menuInicial = () => [
@@ -28,8 +30,10 @@ let reserva = { items: [], inicio: null }; //{id, cantidad} + momento en que ini
 let temporizador = null; //Control del limite de tiempo
 let reservaExpirada = false; //Avisa al request que la reserva se cerro
 
-//      FUNCIONES AUXILIARES
 
+/*=============================================================
+                    FUNCIONES AUXILIARES
+===============================================================*/   
 const redondear = (numero) => Math.round(numero * 100) / 100; //Evita errores de decimales 
 const buscarAlimento = (id) => menu.find((alimento) => alimento.id === id);
 const buscarItemReserva = (id) => reserva.items / find((item) => item.id === id);
@@ -82,7 +86,7 @@ const iniciarTemporizador = () => {
     temporizador = setTimeout(() => {
         liberarReserva();
         reservaExpirada = true;
-        console.log("La reserva expiró y se liberó el stock");
+        console.log("La reserva expiro y se libero el stock");
     }, DURACION_RESERVA_MS);
 };
 
@@ -90,7 +94,7 @@ const iniciarTemporizador = () => {
                         MIDDLEWARE
 ===============================================================*/
 
-//Caundo la reserva expira, se le aviso al usuario (1 vez)
+//Cuando la reserva expira, se le aviso al usuario (1 vez)
 app.use("/api/reserva", (req, res, next) => {
    if(reservaExpirada) {
     reservaExpirada = false;
@@ -166,7 +170,7 @@ app.put("/api/reserva/actualizar-porciones/:id", (req, res) => {
   }
 
   const alimento = buscarAlimento(id);
-  const diferencia = nuevaCantidad - item.cantidad; // positivo = sube, negativo = baja
+  const diferencia = nuevaCantidad - item.cantidad;
 
   if (diferencia > 0) {
     // validacion para stock

@@ -230,23 +230,3 @@ app.post("/api/reserva/confirmar", (req, res) => {
 
   res.json({ mensaje: `Reserva confirmada! por $${total.toFixed(2)}`, ...construirReserva() });
 });
-
-/* RUTA OPCIONAL
-Solo para resetear el sistema desde cero luego de las pruebas*/
-app.post("/api/reset-demo", (req, res) => {
-  menu = menuInicial();
-  saldoMensual = SALDO_MENSUAL_INICIAL;
-  reserva.items = [];
-  detenerTemporizador();
-  reservaExpirada = false;
-  res.json({ mensaje: "Los datos han sido reiniciados" });
-});
-
-
-app.use((err, req, res, next) => {
-  res.status(400).json({ mensaje: "Solicitud invalida" });
-});
-
-app.listen(PORT, () => {
-  console.log(`Esta corriendo el servidor del ejericio 2 en http://localhost:${PORT}`);
-});

@@ -86,3 +86,156 @@ const iniciarTemporizador = () => {
     }, DURACION_RESERVA_MS);
 };
 
+/*=============================================================
+                        MIDDLEWARE
+===============================================================*/
+
+//Caundo la reserva expira, se le aviso al usuario (1 vez)
+app.use("/api/reserva", (req, res, next) => {
+   if(reservaExpirada) {
+    reservaExpirada = false;
+    return res.status(410).json({
+        mensaje: "Se acabo el tiempo! Se cerro la reserva, inicia una nueva.",
+    })
+   }
+   next();
+});
+
+/*=============================================================
+                         RUTAS
+===============================================================*/
+
+// RUTA 1: GET/api/menu
+app.get("/api/menu", (req, res) => {
+    res.json(menu);
+});
+
+// RUTA 2: GET/api/reserva
+app.get("/api/reserva", (req, res) => {
+    res.json(construirReserva());
+});
+
+// RUTA 3: POST/api/reserva/agregar
+app.post("/api/reserva/agregar", (req,res) => {
+   const alimentoId = Number(req.body.alimentoId);
+   const cantidad = Number(req.body.cantidad);
+
+   const alimento = buscarAlimento(alimentoId);
+   if (!alimento) {
+    return res.status(400).json({mensaje: "El platillo no existe"});
+   }
+
+   if(!Number.isInteger(cantidad) || cantidad < 1){
+    return res.status(400).json({mensaje: "La cantidad deber ser un entero mayor a 0"});
+   }
+
+   // validacion para stock
+   if(alimento.stock < cantidad){
+    return res.status(400).json({mensaje: "Stock insuficiente!"});
+   }
+
+   //validacion para saldo del cleinte
+   if(calcularTotal() + alimento.precio * cantidad > saldoMensual) {
+    return res.status(400).json({mensaje: "El saldo no alcanza para esta cantidad!!"});
+   }
+   alimento.stock -= cantidad;
+
+   const itemExistente = buscarItemReserva(alimentoId);
+   if (itemExistente){
+    itemExistente.cantidad += cantidad;
+   } else {
+    reserva.items.push({id: alimentoId, cantidad});
+   }
+
+   iniciarTemporizador();
+   res.json(construirReserva());
+});
+
+// RUTA 4: PUT/api/reserva/actualizar-porciones/:id
+app.put("/api/reserva/actualizar-porciones/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const nuevaCantidad = Number(req.body.cantidad);
+
+  const item = buscarItemReserva(id);
+  if (!item) {
+    return res.status(404).json({ mensaje: "Ese plato no esta en tu reserva" });
+  }
+
+  if (!Number.isInteger(nuevaCantidad) || nuevaCantidad < 0) {
+    return res.status(400).json({ mensaje: "Hubo un problema! La cantidad debe ser un entero mayor o igual a 0" });
+  }
+
+  const alimento = buscarAlimento(id);
+  const diferencia = nuevaCantidad - item.cantidad; // positivo = sube, negativo = baja
+
+  if (diferencia > 0) {
+    // validacion para stock
+    if (alimento.stock < diferencia) {
+      return res.status(400).json({ mensaje: "Stock insuficiente" });
+    }
+    // validacin para el saldo
+    if (calcularTotal() + alimento.precio * diferencia > saldoMensual) {
+      return res.status(400).json({ mensaje: "oh no...El saldo no alcanza para esta cantidad" });
+    }
+  }
+  alimento.stock -= diferencia;
+
+  if (nuevaCantidad === 0) {
+    reserva.items = reserva.items.filter((i) => i.id !== id);
+    if (reserva.items.length === 0) detenerTemporizador();
+  } else {
+    item.cantidad = nuevaCantidad;
+  }
+  res.json(construirReserva());
+});
+
+// RUTA 5: DELETE/api/reserva/eliminar/:id
+app.delete("/api/reserva/eliminar/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  const item = buscarItemReserva(id);
+  if (!item) {
+    return res.status(404).json({ mensaje: "Oh oh! Ese plato no esta en tu reserva" });
+  }
+
+  const alimento = buscarAlimento(id);
+  alimento.stock += item.cantidad;
+  reserva.items = reserva.items.filter((i) => i.id !== id);
+
+  if (reserva.items.length === 0) detenerTemporizador();
+  res.json(construirReserva());
+});
+
+//RUTA 6: POST/api/reserva/confirmar
+app.post("/api/reserva/confirmar", (req, res) => {
+  if (reserva.items.length === 0) {
+    return res.status(400).json({ mensaje: "No podemos proceder tu solicitud, ya que tu reserva esta vacia" });
+  }
+
+  const total = calcularTotal();
+  saldoMensual = redondear(saldoMensual - total);
+  reserva.items = [];
+  detenerTemporizador();
+
+  res.json({ mensaje: `Reserva confirmada! por $${total.toFixed(2)}`, ...construirReserva() });
+});
+
+/* RUTA OPCIONAL
+Solo para resetear el sistema desde cero luego de las pruebas*/
+app.post("/api/reset-demo", (req, res) => {
+  menu = menuInicial();
+  saldoMensual = SALDO_MENSUAL_INICIAL;
+  reserva.items = [];
+  detenerTemporizador();
+  reservaExpirada = false;
+  res.json({ mensaje: "Los datos han sido reiniciados" });
+});
+
+
+app.use((err, req, res, next) => {
+  res.status(400).json({ mensaje: "Solicitud invalida" });
+});
+
+app.listen(PORT, () => {
+  console.log(`Esta corriendo el servidor del ejericio 2 en http://localhost:${PORT}`);
+});

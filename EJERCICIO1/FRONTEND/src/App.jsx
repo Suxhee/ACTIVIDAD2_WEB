@@ -26,18 +26,23 @@ function App() {
 
   // Enviamos la respuesta al servidor con fetch y actualizamos el estado con la respuesta del servidor
   try {
-    const respuesta = await fetch("http://localhost:3000/guess", { //VERIFICAR SI LA URL ES CORRECTA
+    const respuesta = await fetch("http://localhost:3001/guess", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ number }),
     });
     const datos = await respuesta.json();
 
-    setHint(datos.result);
-    setAttempts([...attempts, number]);
+    if (!respuesta.ok) {
+      setHint(datos.mensaje || "No se pudo validar el intento");
+      return;
+    }
+
+    setHint(datos.mensaje || datos.resultado);
+    setAttempts((anteriores) => [...anteriores, number]);
     setUserGuess("");
 
-    if (datos.result === "correcto") {
+    if (datos.resultado === "correcto") {
       setGameStatus(true);
     }
   } catch (error) {
@@ -47,7 +52,10 @@ function App() {
 
 const reiniciar = async () => {
   try {
-    await fetch("http://localhost:3000/reset", { method: "POST" }); //VERIFICAR SI LA URL ES CORRECTA
+    const respuesta = await fetch("http://localhost:3001/reset", { method: "POST" });
+    if (!respuesta.ok) {
+      throw new Error("No se pudo reiniciar el juego");
+    }
 
     setAttempts([]);
     setGameStatus(false);

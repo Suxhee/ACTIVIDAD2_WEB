@@ -35,7 +35,7 @@ async function peticion(ruta, opciones = {}) {
     if (!respuesta.ok) {
         const mensaje = 
            datos && typeof datos === "object"
-               ? datos.mensaje || datos.error || datos.mensaje : null;
+               ? datos.mensaje || datos.error : null;
             throw new Error(mensaje || `Error HTTP ${respuesta.status}`);
     }
 

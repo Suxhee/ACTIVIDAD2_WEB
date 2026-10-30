@@ -4,6 +4,10 @@ import cors from "cors";
 const app = express();
 const PORT = 3002;
 
+// Permitir peticiones desde React (Vite) y leer cuerpos JSON.
+app.use(cors());
+app.use(express.json());
+
 const SALDO_MENSUAL_INICIAL = 36.0; //Saldo de almuerzo del usuario
 const DURACION_RESERVA_MS = 5 * 60 * 1000; //Limite de tiempo (5 minutos)
 
@@ -36,7 +40,7 @@ let reservaExpirada = false; //Avisa al request que la reserva se cerro
 ===============================================================*/   
 const redondear = (numero) => Math.round(numero * 100) / 100; //Evita errores de decimales 
 const buscarAlimento = (id) => menu.find((alimento) => alimento.id === id);
-const buscarItemReserva = (id) => reserva.items / find((item) => item.id === id);
+const buscarItemReserva = (id) => reserva.items.find((item) => item.id === id);
 
 //Suma precio * cantidad de todos los items de la reserva 
 const calcularTotal = () => redondear(reserva.items.reduce((acumulado, item) => {
@@ -98,9 +102,12 @@ const iniciarTemporizador = () => {
 app.use("/api/reserva", (req, res, next) => {
    if(reservaExpirada) {
     reservaExpirada = false;
-    return res.status(410).json({
-        mensaje: "Se acabo el tiempo! Se cerro la reserva, inicia una nueva.",
-    })
+    // Las lecturas deben poder sincronizar la interfaz tras la expiracion.
+    if (req.method !== "GET") {
+      return res.status(410).json({
+          mensaje: "Se acabo el tiempo! Se cerro la reserva, inicia una nueva.",
+      });
+    }
    }
    next();
 });

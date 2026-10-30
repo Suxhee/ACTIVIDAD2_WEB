@@ -48,7 +48,7 @@ export function useReserva() {
             try {
                 await cargarDatos();
             } catch (error) {
-                setMensajeError(error.mensaje);
+                setMensajeError(error.message);
             } finally {
                 setCargando(false);
             }
@@ -72,7 +72,7 @@ export function useReserva() {
 
                     setMensajeError("El tiempo de reserva termino. Consulta tu reserva para comenzar nuevamente");
                 } catch (error) {
-                    setMensajeError(error.mensaje);
+                    setMensajeError(error.message);
                 }
             }
 
@@ -117,7 +117,7 @@ export function useReserva() {
 
         } catch (error) {
             //Mostrar error enviado por Express
-            setMensajeError(error.mensaje);
+            setMensajeError(error.message);
 
             //Intentar sincronizar el estado tras el error
             try {

@@ -142,12 +142,12 @@ app.post("/api/reserva/agregar", (req,res) => {
 
    // validacion para stock
    if(alimento.stock < cantidad){
-    return res.status(400).json({mensaje: "Stock insuficiente!"});
+    return res.status(400).json({mensaje: "Stock insuficiente."});
    }
 
    //validacion para saldo del cleinte
    if(calcularTotal() + alimento.precio * cantidad > saldoMensual) {
-    return res.status(400).json({mensaje: "El saldo no alcanza para esta cantidad!!"});
+    return res.status(400).json({mensaje: "Saldo insuficiente para esta cantidad"});
    }
    alimento.stock -= cantidad;
 
@@ -186,7 +186,7 @@ app.put("/api/reserva/actualizar-porciones/:id", (req, res) => {
     }
     // validacin para el saldo
     if (calcularTotal() + alimento.precio * diferencia > saldoMensual) {
-      return res.status(400).json({ mensaje: "oh no...El saldo no alcanza para esta cantidad" });
+      return res.status(400).json({ mensaje: "Saldo insuficiente para esta cantidad" });
     }
   }
   alimento.stock -= diferencia;
